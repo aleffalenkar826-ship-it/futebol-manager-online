@@ -101,3 +101,33 @@ renderStats=function(){
  const leaders=document.getElementById('leaders');
  if(leaders)leaders.innerHTML=`<div class="leader"><b>🥇 Artilheiro</b><strong>${esc(top?.name||'A definir')} · ⚽ ${Number(top?.goals)||0}</strong></div><div class="leader"><b>🟨 Disciplina</b><strong>${esc(cards?.name||'Sem cartões')}</strong></div><div class="leader"><b>⚡ Média de gols</b><strong>${played.length?(goalTotal/played.length).toFixed(1):'0.0'} por jogo</strong></div>`;
 };
+
+// V6: cada informação abre em uma tela individual.
+function openScreen(name, push=true){
+  const target=document.querySelector(`.app-screen[data-screen="${name}"]`) || document.querySelector('.app-screen[data-screen="home"]');
+  document.querySelectorAll('.app-screen').forEach(s=>s.classList.toggle('active',s===target));
+  document.querySelectorAll('.app-tabs [data-screen-go]').forEach(b=>b.classList.toggle('active',b.dataset.screenGo===name));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(push){
+    const u=new URL(location.href); u.searchParams.set('tela',name);
+    history.pushState({screen:name},'',u);
+  }
+  const mirror=document.getElementById('statsMirror'), summary=document.getElementById('summary');
+  if(name==='stats' && mirror && summary) mirror.innerHTML=summary.innerHTML;
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-screen-go]'); if(!b)return;
+  e.preventDefault(); openScreen(b.dataset.screenGo);
+});
+window.addEventListener('popstate',()=>{
+  const name=new URL(location.href).searchParams.get('tela')||'home'; openScreen(name,false);
+});
+setTimeout(()=>openScreen(new URL(location.href).searchParams.get('tela')||'home',false),0);
+
+// Mantém o aviso da área administrativa sincronizado com o login.
+const adminObserver=new MutationObserver(()=>{
+ const admin=document.getElementById('admin'), lock=document.getElementById('adminLocked');
+ if(admin&&lock) lock.classList.toggle('hidden',!admin.classList.contains('hidden'));
+});
+const adminNode=document.getElementById('admin');
+if(adminNode) adminObserver.observe(adminNode,{attributes:true,attributeFilter:['class']});

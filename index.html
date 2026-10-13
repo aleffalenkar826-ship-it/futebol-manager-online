@@ -18,10 +18,66 @@ main{margin-top:-30px}.panel{transition:.18s transform,.18s box-shadow}.panel:ho
 .leader-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.leader{padding:12px;border-radius:14px;background:linear-gradient(145deg,#f8fbff,#edf5ff);min-width:0}.leader b{display:block;font-size:12px;color:#63758a}.leader strong{display:block;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .admin-note{background:#fff8dc;border:1px solid #f2d77d;padding:10px 12px;border-radius:12px;color:#6f5913}
 @media(max-width:600px){main{padding:10px}.panel{border-radius:16px;margin:10px 0}.leader-strip{grid-template-columns:1fr}.actions{display:flex}.actions button{flex:1}}
-</style></head><body><header><h1>⚽ Futebol Manager Online</h1><p>Campeonatos • Jogos • Classificação • Artilharia</p><span class="hero-badge">⚡ Central do campeonato em tempo real</span></header><main><section class="panel"><label>Campeonato <select id="champSelect"></select></label><button id="loginToggle">Área administrativa</button><div id="champActions" class="actions"></div><p id="status" class="muted"></p></section><section class="panel hidden" id="loginBox"><h2>Entrar como administrador</h2><input id="email" type="email" placeholder="E-mail"><input id="password" type="password" placeholder="Senha"><button id="login">Entrar</button><button id="logout" class="hidden">Sair</button></section><section id="admin" class="hidden"><div class="panel"><h2>Novo campeonato</h2><input id="champName" placeholder="Nome do campeonato"><button id="addChamp">Cadastrar</button></div><div class="panel"><h2>⚽ Novo time</h2><input id="teamName" placeholder="Nome do time"><label>Escudo do time <input id="teamCrestFile" type="file" accept="image/*"></label><input id="teamCrest" type="url" placeholder="Ou URL do escudo (opcional)"><button id="addTeam">Cadastrar</button></div><div class="panel"><h2>📸 Novo jogador</h2><input id="playerName" placeholder="Nome do jogador"><select id="playerTeam"></select><input id="playerNumber" type="number" placeholder="Camisa"><label>Foto do jogador <input id="playerPhotoFile" type="file" accept="image/*"></label><button id="addPlayer">Cadastrar</button></div><div class="panel"><h2>Novo jogo / resultado</h2><select id="home"></select><input id="homeScore" type="number" min="0" placeholder="Gols casa"><span>×</span><input id="awayScore" type="number" min="0" placeholder="Gols visitante"><select id="away"></select><input id="matchDate" type="datetime-local"><input id="matchVenue" placeholder="Local"><button id="addMatch">Salvar jogo</button><p class="muted">Deixe os gols em branco para jogo ainda não realizado.</p></div></section><section class="panel section-anchor" id="classificationSection"><h2>🏆 Classificação</h2><div style="overflow:auto"><table><thead><tr><th>#</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th></tr></thead><tbody id="standings"></tbody></table></div></section><section class="panel section-anchor" id="gamesSection"><h2>📅 Jogos</h2><div id="matches"></div></section><section class="panel section-anchor" id="teamsSection"><h2>👥 Times e jogadores</h2><div id="teams"></div></section><section class="panel section-anchor" id="scorersSection"><h2>🥇 Artilharia</h2><div id="scorers"></div></section><section class="panel"><h2>🟨🟥 Cartões e disciplina</h2><div id="discipline"></div></section><section class="panel section-anchor" id="summarySection"><h2>📊 Resumo do campeonato</h2><div id="leaders" class="leader-strip"></div><div id="summary" class="stats"></div></section></main><dialog id="editDialog"><h2 id="editTitle">Editar</h2><div id="editFields"></div><div class="dialog-actions"><button id="editCancel" type="button" class="secondary">Cancelar</button><button id="editSave" type="button">Salvar alterações</button></div></dialog><nav class="app-tabs" aria-label="Navegação">
-<button data-go="summarySection" class="active"><b>⌂</b>Início</button>
-<button data-go="gamesSection"><b>⚽</b>Jogos</button>
-<button data-go="classificationSection"><b>🏆</b>Tabela</button>
-<button data-go="scorersSection"><b>🥇</b>Artilharia</button>
-<button data-go="teamsSection"><b>👥</b>Times</button>
-</nav><script type="module" src="./app.js"></script></body></html>
+
+/* V6 — telas individuais */
+.app-screen{display:none;animation:screenIn .22s ease}.app-screen.active{display:block}
+@keyframes screenIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+.screen-title{display:flex;align-items:center;gap:10px;margin:4px 2px 12px}.screen-title button{width:38px;height:38px;padding:0;margin:0;border-radius:12px;background:#eaf2fb;color:#163a5d}
+.home-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0}
+.home-tile{border:0;border-radius:17px!important;padding:17px 10px!important;min-height:94px!important;background:linear-gradient(145deg,#fff,#eef6ff)!important;color:#102e4c!important;box-shadow:0 7px 20px #0d355515;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}
+.home-tile b{font-size:25px;margin-bottom:5px}.home-tile span{font-weight:800}.home-tile small{font-size:11px;color:#718296;margin-top:3px;text-align:left}
+.screen-head{background:linear-gradient(135deg,#071a31,#0b63d1);color:#fff;border-radius:18px;padding:18px;margin-bottom:10px}
+.screen-head h2{margin:0}.screen-head p{margin:5px 0 0;color:#d7e7f8;font-size:13px}
+#adminScreen .panel{border-left:4px solid #0b63d1}
+.more-nav{display:flex;gap:8px;overflow:auto;padding:2px 0 8px}.more-nav button{white-space:nowrap}
+.app-tabs{overflow-x:auto;justify-content:space-around}.app-tabs button{min-width:62px}
+@media(min-width:700px){.home-grid{grid-template-columns:repeat(4,1fr)}}
+</style></head><body><header><h1>⚽ Futebol Manager Online</h1><p>Campeonatos • Jogos • Classificação • Artilharia</p><span class="hero-badge">⚡ Central do campeonato em tempo real</span></header><main>
+<section class="app-screen active" id="homeScreen" data-screen="home">
+  <div class="panel">
+    <label>Campeonato <select id="champSelect"></select></label>
+    <button id="loginToggle">Área administrativa</button>
+    <div id="champActions" class="actions"></div><p id="status" class="muted"></p>
+  </div>
+  <section class="panel hidden" id="loginBox"><h2>Entrar como administrador</h2><input id="email" type="email" placeholder="E-mail"><input id="password" type="password" placeholder="Senha"><button id="login">Entrar</button><button id="logout" class="hidden">Sair</button></section>
+  <div class="screen-head"><h2>⚽ Central do campeonato</h2><p>Escolha uma área para acompanhar tudo em uma tela própria.</p></div>
+  <div class="home-grid">
+    <button class="home-tile" data-screen-go="games"><b>⚽</b><span>Jogos</span><small>Agenda e resultados</small></button>
+    <button class="home-tile" data-screen-go="classification"><b>🏆</b><span>Classificação</span><small>Tabela completa</small></button>
+    <button class="home-tile" data-screen-go="scorers"><b>🥇</b><span>Artilharia</span><small>Ranking de gols</small></button>
+    <button class="home-tile" data-screen-go="teams"><b>🛡️</b><span>Times</span><small>Elencos e jogadores</small></button>
+    <button class="home-tile" data-screen-go="discipline"><b>🟨</b><span>Cartões</span><small>Disciplina</small></button>
+    <button class="home-tile" data-screen-go="stats"><b>📊</b><span>Estatísticas</span><small>Resumo do campeonato</small></button>
+    <button class="home-tile" data-screen-go="admin"><b>⚙️</b><span>Administrar</span><small>Cadastros e edições</small></button>
+  </div>
+  <section class="panel"><h2>📊 Destaques</h2><div id="leaders" class="leader-strip"></div><div id="summary" class="stats"></div></section>
+</section>
+
+<section class="app-screen" id="gamesScreen" data-screen="games"><div class="screen-head"><h2>⚽ Jogos</h2><p>Próximas partidas, locais e resultados.</p></div><section class="panel"><div id="matches"></div></section></section>
+
+<section class="app-screen" id="classificationScreen" data-screen="classification"><div class="screen-head"><h2>🏆 Classificação</h2><p>Posições e desempenho das equipes.</p></div><section class="panel"><div style="overflow:auto"><table><thead><tr><th>#</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th></tr></thead><tbody id="standings"></tbody></table></div></section></section>
+
+<section class="app-screen" id="scorersScreen" data-screen="scorers"><div class="screen-head"><h2>🥇 Artilharia</h2><p>Ranking dos maiores goleadores.</p></div><section class="panel"><div id="scorers"></div></section></section>
+
+<section class="app-screen" id="teamsScreen" data-screen="teams"><div class="screen-head"><h2>🛡️ Times e jogadores</h2><p>Escudos, elencos e estatísticas individuais.</p></div><section class="panel"><div id="teams"></div></section></section>
+
+<section class="app-screen" id="disciplineScreen" data-screen="discipline"><div class="screen-head"><h2>🟨🟥 Cartões</h2><p>Controle disciplinar dos jogadores.</p></div><section class="panel"><div id="discipline"></div></section></section>
+
+<section class="app-screen" id="statsScreen" data-screen="stats"><div class="screen-head"><h2>📊 Estatísticas</h2><p>Números gerais do campeonato.</p></div><section class="panel"><div id="statsMirror" class="stats"></div><p class="muted">Os destaques também aparecem na tela Início.</p></section></section>
+
+<section class="app-screen" id="adminScreen" data-screen="admin"><div class="screen-head"><h2>⚙️ Administração</h2><p>Somente o administrador pode alterar os dados.</p></div>
+<section id="admin" class="hidden">
+<div class="panel"><h2>Novo campeonato</h2><input id="champName" placeholder="Nome do campeonato"><button id="addChamp">Cadastrar</button></div>
+<div class="panel"><h2>⚽ Novo time</h2><input id="teamName" placeholder="Nome do time"><label>Escudo do time <input id="teamCrestFile" type="file" accept="image/*"></label><input id="teamCrest" type="url" placeholder="Ou URL do escudo (opcional)"><button id="addTeam">Cadastrar</button></div>
+<div class="panel"><h2>📸 Novo jogador</h2><input id="playerName" placeholder="Nome do jogador"><select id="playerTeam"></select><input id="playerNumber" type="number" placeholder="Camisa"><label>Foto do jogador <input id="playerPhotoFile" type="file" accept="image/*"></label><button id="addPlayer">Cadastrar</button></div>
+<div class="panel"><h2>Novo jogo / resultado</h2><select id="home"></select><input id="homeScore" type="number" min="0" placeholder="Gols casa"><span>×</span><input id="awayScore" type="number" min="0" placeholder="Gols visitante"><select id="away"></select><input id="matchDate" type="datetime-local"><input id="matchVenue" placeholder="Local"><button id="addMatch">Salvar jogo</button><p class="muted">Deixe os gols em branco para jogo ainda não realizado.</p></div>
+</section>
+<div id="adminLocked" class="panel admin-note">🔒 Entre como administrador pela tela Início para cadastrar ou editar informações.</div>
+</section>
+</main><dialog id="editDialog"><h2 id="editTitle">Editar</h2><div id="editFields"></div><div class="dialog-actions"><button id="editCancel" type="button" class="secondary">Cancelar</button><button id="editSave" type="button">Salvar alterações</button></div></dialog><nav class="app-tabs" aria-label="Navegação principal">
+<button data-screen-go="home" class="active"><b>⌂</b>Início</button>
+<button data-screen-go="games"><b>⚽</b>Jogos</button>
+<button data-screen-go="classification"><b>🏆</b>Tabela</button>
+<button data-screen-go="scorers"><b>🥇</b>Artilharia</button>
+<button data-screen-go="teams"><b>🛡️</b>Times</button>
+</nav><script type="module" src="./app.js?v=6"></script></body></html>
