@@ -45,11 +45,18 @@ h2{font-size:20px;font-weight:900;color:#102e4c;letter-spacing:-.2px}
 table{font-size:14px}th{font-weight:900;color:#17354f;background:#eef5fb}td{font-weight:650;color:#18334c}
 button{font-weight:800}input,select{font-size:16px;color:#10263b;font-weight:600}
 .app-tabs button{font-size:11px;font-weight:800;color:#cbd7e5}.app-tabs button.active{color:#fff}
+
+/* V8 — administração sempre fácil de encontrar */
+#adminScreen .panel h2{margin-bottom:12px}
+#adminScreen input,#adminScreen select{width:100%;margin:6px 0 10px}
+#adminScreen button{width:100%;min-height:46px}
+.admin-locked-controls{opacity:.62}
+.app-tabs button[data-screen-go="admin"]{min-width:66px}
 </style></head><body><header><h1>⚽ AL Amigos Da Bola</h1><p>Campeonatos • Jogos • Classificação • Artilharia</p><span class="hero-badge">⚡ Central do campeonato em tempo real</span></header><main>
 <section class="app-screen active" id="homeScreen" data-screen="home">
   <div class="panel">
     <label>Campeonato <select id="champSelect"></select></label>
-    <button id="loginToggle">Área administrativa</button>
+    <button id="loginToggle">🔐 Entrar como administrador</button>
     <div id="champActions" class="actions"></div><p id="status" class="muted"></p>
   </div>
   <section class="panel hidden" id="loginBox"><h2>Entrar como administrador</h2><input id="email" type="email" placeholder="E-mail"><input id="password" type="password" placeholder="Senha"><button id="login">Entrar</button><button id="logout" class="hidden">Sair</button></section>
@@ -78,14 +85,14 @@ button{font-weight:800}input,select{font-size:16px;color:#10263b;font-weight:600
 
 <section class="app-screen" id="statsScreen" data-screen="stats"><div class="screen-head"><h2>📊 Estatísticas</h2><p>Números gerais do campeonato.</p></div><section class="panel"><div id="statsMirror" class="stats"></div><p class="muted">Os destaques também aparecem na tela Início.</p></section></section>
 
-<section class="app-screen" id="adminScreen" data-screen="admin"><div class="screen-head"><h2>⚙️ Administração</h2><p>Somente o administrador pode alterar os dados.</p></div>
-<section id="admin" class="hidden">
+<section class="app-screen" id="adminScreen" data-screen="admin"><div class="screen-head"><h2>⚙️ Administração</h2><p>Cadastre e edite campeonatos, times, jogadores e partidas.</p></div>
+<section id="admin">
 <div class="panel"><h2>Novo campeonato</h2><input id="champName" placeholder="Nome do campeonato"><button id="addChamp">Cadastrar</button></div>
 <div class="panel"><h2>⚽ Novo time</h2><input id="teamName" placeholder="Nome do time"><label>Escudo do time <input id="teamCrestFile" type="file" accept="image/*"></label><input id="teamCrest" type="url" placeholder="Ou URL do escudo (opcional)"><button id="addTeam">Cadastrar</button></div>
 <div class="panel"><h2>📸 Novo jogador</h2><input id="playerName" placeholder="Nome do jogador"><select id="playerTeam"></select><input id="playerNumber" type="number" placeholder="Camisa"><label>Foto do jogador <input id="playerPhotoFile" type="file" accept="image/*"></label><button id="addPlayer">Cadastrar</button></div>
 <div class="panel"><h2>Novo jogo / resultado</h2><select id="home"></select><input id="homeScore" type="number" min="0" placeholder="Gols casa"><span>×</span><input id="awayScore" type="number" min="0" placeholder="Gols visitante"><select id="away"></select><input id="matchDate" type="datetime-local"><input id="matchVenue" placeholder="Local"><button id="addMatch">Salvar jogo</button><p class="muted">Deixe os gols em branco para jogo ainda não realizado.</p></div>
 </section>
-<div id="adminLocked" class="panel admin-note">🔒 Entre como administrador pela tela Início para cadastrar ou editar informações.</div>
+<div id="adminLocked" class="panel admin-note">🔒 Para salvar alterações, entre como administrador pela tela Início.</div>
 </section>
 </main><dialog id="editDialog"><h2 id="editTitle">Editar</h2><div id="editFields"></div><div class="dialog-actions"><button id="editCancel" type="button" class="secondary">Cancelar</button><button id="editSave" type="button">Salvar alterações</button></div></dialog><nav class="app-tabs" aria-label="Navegação principal">
 <button data-screen-go="home" class="active"><b>⌂</b>Início</button>
@@ -93,4 +100,5 @@ button{font-weight:800}input,select{font-size:16px;color:#10263b;font-weight:600
 <button data-screen-go="classification"><b>🏆</b>Tabela</button>
 <button data-screen-go="scorers"><b>🥇</b>Artilharia</button>
 <button data-screen-go="teams"><b>🛡️</b>Times</button>
-</nav><script type="module" src="./app.js?v=7"></script></body></html>
+<button data-screen-go="admin"><b>⚙️</b>Admin</button>
+</nav><script type="module" src="./app.js?v=8"></script></body></html>

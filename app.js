@@ -131,3 +131,22 @@ const adminObserver=new MutationObserver(()=>{
 });
 const adminNode=document.getElementById('admin');
 if(adminNode) adminObserver.observe(adminNode,{attributes:true,attributeFilter:['class']});
+
+// V8: painel administrativo sempre visível; edição liberada após login.
+function syncAdminAccess(){
+ const section=document.getElementById('admin');
+ const lock=document.getElementById('adminLocked');
+ if(!section)return;
+ section.classList.remove('hidden');
+ section.classList.toggle('admin-locked-controls',!isAdmin);
+ section.querySelectorAll('input,select,button').forEach(el=>el.disabled=!isAdmin);
+ if(lock) lock.classList.toggle('hidden',isAdmin);
+}
+const accessObserver=new MutationObserver(()=>setTimeout(syncAdminAccess,0));
+const loginBoxV8=document.getElementById('loginBox');
+if(loginBoxV8) accessObserver.observe(loginBoxV8,{attributes:true,subtree:true,attributeFilter:['class']});
+document.addEventListener('click',e=>{
+ if(e.target.closest('[data-screen-go="admin"]')) setTimeout(syncAdminAccess,0);
+});
+setInterval(syncAdminAccess,1200);
+setTimeout(syncAdminAccess,100);
