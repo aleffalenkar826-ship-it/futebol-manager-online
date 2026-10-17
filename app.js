@@ -896,3 +896,57 @@ render = function () {
 };
 
 adicionarBotoesCompartilharV26();
+/* V27 - Compartilhar jogos no modelo atual */
+
+function compartilharJogosV27() {
+  const area = document.getElementById('matches');
+  if (!area) return;
+
+  area.querySelectorAll('.match-card').forEach(cartao => {
+    if (cartao.querySelector('.compartilhar-v27')) return;
+
+    const botao = document.createElement('button');
+    botao.type = 'button';
+    botao.className = 'compartilhar-v27';
+    botao.textContent = '📤 Compartilhar resultado';
+    botao.style.cssText =
+      'display:block;margin-top:12px;padding:12px;' +
+      'width:100%;border-radius:10px;background:#071a31;' +
+      'color:white;font-weight:bold;cursor:pointer;';
+
+    botao.addEventListener('click', async () => {
+      const texto = [
+        '🏆 5º CAMPEONATO AMIGOS DA BOLA 2026',
+        '',
+        cartao.querySelector('.match-score')?.innerText ||
+          cartao.innerText.split('\n')[0],
+        '',
+        '⚽ AL Amigos Da Bola'
+      ].join('\n');
+
+      try {
+        if (navigator.share) {
+          await navigator.share({ text: texto });
+        } else {
+          await navigator.clipboard.writeText(texto);
+          alert('Resultado copiado!');
+        }
+      } catch (erro) {
+        if (erro.name !== 'AbortError') {
+          alert('Não foi possível compartilhar.');
+        }
+      }
+    });
+
+    cartao.appendChild(botao);
+  });
+}
+
+const renderAnteriorV27 = render;
+
+render = function () {
+  renderAnteriorV27();
+  compartilharJogosV27();
+};
+
+compartilharJogosV27();
