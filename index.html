@@ -52,6 +52,120 @@ button{font-weight:800}input,select{font-size:16px;color:#10263b;font-weight:600
 #adminScreen button{width:100%;min-height:46px}
 .admin-locked-controls{opacity:.62}
 .app-tabs button[data-screen-go="admin"]{min-width:66px}
+/* V20 — VISUAL PROFISSIONAL AL AMIGOS DA BOLA */
+
+:root {
+  --nav: #07172d;
+  --blue: #1256ad;
+  --green: #16a085;
+}
+
+body {
+  background: linear-gradient(160deg, #e8f0fc, #f8fafc);
+  color: #10243d;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  background: linear-gradient(135deg, #06152b, #0d3973 65%, #1263bf);
+  border-bottom: 3px solid #d9b35d;
+  box-shadow: 0 8px 25px #07172d33;
+}
+
+header h1 {
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: -.6px;
+  text-shadow: 0 3px 12px #0005;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #dce5f0;
+  border-radius: 22px;
+  box-shadow: 0 10px 30px #10243d12;
+}
+
+.screen-head {
+  background: linear-gradient(120deg, #07172d, #1256ad);
+  border-radius: 22px;
+  box-shadow: 0 8px 20px #07172d26;
+}
+
+.match-card {
+  background: linear-gradient(145deg, #fff, #f1f6fd);
+  border: 1px solid #dce5f0;
+  border-radius: 18px;
+  box-shadow: 0 5px 14px #07172d0d;
+}
+
+.match-score {
+  background: #07172d;
+  color: #fff;
+  border-radius: 14px;
+  font-weight: 900;
+}
+
+.player-card {
+  background: #f7faff;
+  border: 1px solid #dce5f0;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.player-photo {
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+button {
+  transition: transform .2s, box-shadow .2s;
+}
+
+button:active {
+  transform: scale(.97);
+}
+
+.app-tabs {
+  background: #07172d;
+  border-top: 2px solid #d9b35d;
+  box-shadow: 0 -5px 20px #07172d26;
+}
+
+.app-tabs button {
+  color: #eaf2ff;
+}
+
+.app-tabs button.active {
+  color: #fff;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th {
+  background: #eaf1f9;
+  color: #10243d;
+}
+
+td {
+  border-bottom: 1px solid #e3eaf3;
+}
+
+@media (max-width: 600px) {
+  .panel {
+    border-radius: 18px;
+  }
+
+  .match-card {
+    border-radius: 16px;
+  }
+
+  .app-tabs button {
+    font-size: 11px;
+  }
+}
 </style></head><body><header><h1>⚽ AL Amigos Da Bola</h1><p>Campeonatos • Jogos • Classificação • Artilharia</p><span class="hero-badge">⚡ Central do campeonato em tempo real</span></header><main>
 <section class="app-screen active" id="homeScreen" data-screen="home">
   <div class="panel">
