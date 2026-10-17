@@ -465,3 +465,142 @@ render = function() {
 
   montarCentralV21();
 })();
+
+// V22 - Visual profissional dos jogos
+(function () {
+  const estilo = document.createElement('style');
+  estilo.textContent = `
+    .v22-card {
+      background: linear-gradient(145deg,#071a35,#103e72);
+      color: white;
+      border: 1px solid #3266a0;
+      border-radius: 20px;
+      padding: 18px 14px;
+      margin: 14px 0;
+      box-shadow: 0 10px 25px #071a3525;
+    }
+    .v22-status {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: #ffd76a;
+      margin-bottom: 15px;
+    }
+    .v22-confronto {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+      align-items: center;
+      gap: 10px;
+    }
+    .v22-equipe {
+      text-align: center;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .v22-escudo {
+      display: block;
+      width: 65px;
+      height: 65px;
+      object-fit: contain;
+      margin: 0 auto 10px;
+    }
+    .v22-placar {
+      font-size: 29px;
+      font-weight: 900;
+      white-space: nowrap;
+      color: #fff;
+    }
+    .v22-info {
+      text-align: center;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #ffffff30;
+      color: #dce8fa;
+      font-size: 13px;
+    }
+    @media(max-width:380px) {
+      .v22-escudo {width:48px;height:48px}
+      .v22-placar {font-size:23px}
+      .v22-equipe {font-size:12px}
+    }
+  `;
+  document.head.appendChild(estilo);
+
+  function montarJogosV22() {
+    const area = document.getElementById('games');
+    if (!area || !Array.isArray(matches) ||
+        !Array.isArray(teams)) return;
+
+    const nome = id =>
+      teams.find(t => t.id === id)?.name || 'Equipe';
+
+    const escudo = id => {
+      const time = teams.find(t => t.id === id);
+      const url = safeUrl(time?.crest || '');
+      return url
+        ? `<img class="v22-escudo" src="${esc(url)}" alt="Escudo">`
+        : '<div style="font-size:40px">🛡️</div>';
+    };
+
+    const jogos = matches.slice().sort((a,b) =>
+      (a.date || '').localeCompare(b.date || '')
+    );
+
+    area.innerHTML = jogos.map(j => {
+      const encerrado =
+        Number.isInteger(j.homeScore) &&
+        Number.isInteger(j.awayScore);
+
+      const aoVivo = j.status === 'live';
+
+      const status = aoVivo
+        ? '🔴 AO VIVO'
+        : encerrado
+          ? '🏁 ENCERRADO'
+          : '📅 AGENDADO';
+
+      const placar = aoVivo
+        ? `${Number(j.liveHomeScore || 0)} × ${Number(j.liveAwayScore || 0)}`
+        : encerrado
+          ? `${j.homeScore} × ${j.awayScore}`
+          : 'X';
+
+      const data = j.date &&
+        !Number.isNaN(new Date(j.date).getTime())
+          ? new Date(j.date).toLocaleString('pt-BR')
+          : 'Data a definir';
+
+      return `
+        <article class="v22-card">
+          <div class="v22-status">${status}</div>
+          <div class="v22-confronto">
+            <div class="v22-equipe">
+              ${escudo(j.homeId)}
+              ${esc(nome(j.homeId))}
+            </div>
+            <div class="v22-placar">${placar}</div>
+            <div class="v22-equipe">
+              ${escudo(j.awayId)}
+              ${esc(nome(j.awayId))}
+            </div>
+          </div>
+          <div class="v22-info">
+            📅 ${esc(data)}
+            <div>📍 ${esc(j.venue || 'Local a definir')}</div>
+          </div>
+        </article>
+      `;
+    }).join('') ||
+      '<p class="muted">Nenhum jogo cadastrado.</p>';
+  }
+
+  const renderAnteriorV22 = render;
+  render = function () {
+    renderAnteriorV22();
+    montarJogosV22();
+  };
+
+  montarJogosV22();
+})();
