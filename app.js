@@ -360,7 +360,7 @@ render = function() {
 // V21 - Central de Resultados e Proximas Rodadas
 (function () {
   function montarCentralV21() {
-    const tela = document.getElementById('home');
+    const tela = document.getElementById('homeScreen');
     if (!tela || !Array.isArray(matches) || !Array.isArray(teams)) return;
 
     let central = document.getElementById('centralV21');
