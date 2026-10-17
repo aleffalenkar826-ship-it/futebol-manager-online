@@ -356,3 +356,112 @@ render = function() {
   renderBeforeV11();
   renderStandingsV11();
 };
+
+// V21 - Central de Resultados e Proximas Rodadas
+(function () {
+  function montarCentralV21() {
+    const tela = document.getElementById('home');
+    if (!tela || !Array.isArray(matches) || !Array.isArray(teams)) return;
+
+    let central = document.getElementById('centralV21');
+
+    if (!central) {
+      central = document.createElement('section');
+      central.id = 'centralV21';
+      central.style.cssText =
+        'margin:16px 0;padding:16px;border-radius:18px;' +
+        'background:#07172d;color:#fff;';
+
+      tela.prepend(central);
+    }
+
+    const nomeTime = id =>
+      teams.find(t => t.id === id)?.name || 'Equipe';
+
+    const dataJogo = jogo => {
+      if (!jogo.date) return 'Data a definir';
+      const d = new Date(jogo.date);
+      return Number.isNaN(d.getTime())
+        ? 'Data a definir'
+        : d.toLocaleString('pt-BR');
+    };
+
+    const encerrado = jogo =>
+      jogo.status !== 'live' &&
+      Number.isInteger(jogo.homeScore) &&
+      Number.isInteger(jogo.awayScore);
+
+    const aoVivo = matches.filter(j => j.status === 'live');
+
+    const proximos = matches
+      .filter(j => j.status !== 'live' && !encerrado(j))
+      .sort((a,b) => (a.date || '').localeCompare(b.date || ''))
+      .slice(0, 5);
+
+    const resultados = matches
+      .filter(encerrado)
+      .sort((a,b) => (b.date || '').localeCompare(a.date || ''))
+      .slice(0, 5);
+
+    const cartao = (j, tipo) => {
+      const casa = nomeTime(j.homeId);
+      const fora = nomeTime(j.awayId);
+
+      let placar = '×';
+
+      if (tipo === 'live') {
+        placar = `${Number(j.liveHomeScore || 0)} × ${Number(j.liveAwayScore || 0)}`;
+      }
+
+      if (tipo === 'finished') {
+        placar = `${j.homeScore} × ${j.awayScore}`;
+      }
+
+      const titulo = tipo === 'live'
+        ? '🔴 AO VIVO'
+        : tipo === 'finished'
+          ? '🏁 ENCERRADO'
+          : '📅 AGENDADO';
+
+      return `
+        <div style="background:#fff;color:#10243d;
+          padding:12px;margin:10px 0;border-radius:12px">
+          <small>${titulo} · ${esc(dataJogo(j))}</small>
+          <div style="display:flex;align-items:center;
+            justify-content:space-between;gap:8px;margin-top:8px">
+            <strong>${esc(casa)}</strong>
+            <b style="white-space:nowrap">${placar}</b>
+            <strong>${esc(fora)}</strong>
+          </div>
+          <small>${esc(j.venue || 'Local a definir')}</small>
+        </div>`;
+    };
+
+    central.innerHTML = `
+      <h2 style="color:#fff;margin:0 0 12px">
+        ⚽ Central do Campeonato
+      </h2>
+
+      <h3 style="color:#fff">🔴 Jogos ao vivo</h3>
+      ${aoVivo.map(j => cartao(j, 'live')).join('') ||
+        '<p>Nenhuma partida ao vivo.</p>'}
+
+      <h3 style="color:#fff">📅 Próximos jogos</h3>
+      ${proximos.map(j => cartao(j, 'scheduled')).join('') ||
+        '<p>Nenhum jogo agendado.</p>'}
+
+      <h3 style="color:#fff">🏆 Últimos resultados</h3>
+      ${resultados.map(j => cartao(j, 'finished')).join('') ||
+        '<p>Nenhum resultado registrado.</p>'}
+    `;
+  }
+
+  const renderAnteriorV21 = render;
+
+  render = function () {
+    renderAnteriorV21();
+    montarCentralV21();
+  };
+
+  montarCentralV21();
+})();
