@@ -604,3 +604,158 @@ render = function() {
 
   montarJogosV22();
 })();
+
+// V23 - Placar profissional com escudos
+(function () {
+  function montarJogosV23() {
+    const area = document.getElementById('games');
+    if (!area || !Array.isArray(matches) || !Array.isArray(teams)) return;
+
+    const estiloId = 'estiloJogosV23';
+    if (!document.getElementById(estiloId)) {
+      const estilo = document.createElement('style');
+      estilo.id = estiloId;
+      estilo.textContent = `
+        .v23-card {
+          background: linear-gradient(145deg,#07132f,#142b50);
+          border: 1px solid #36517b;
+          border-radius: 18px;
+          padding: 20px 14px;
+          margin: 14px 0;
+          color: white;
+          box-shadow: 0 8px 22px #0003;
+        }
+        .v23-status {
+          text-align: center;
+          font-size: 12px;
+          font-weight: 800;
+          color: #f2c35b;
+          margin-bottom: 16px;
+        }
+        .v23-confronto {
+          display: grid;
+          grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+          align-items: center;
+          gap: 8px;
+        }
+        .v23-equipe {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 9px;
+          min-width: 0;
+          text-align: center;
+          font-weight: 800;
+          font-size: 13px;
+          overflow-wrap: anywhere;
+        }
+        .v23-escudo {
+          width: 70px;
+          height: 70px;
+          object-fit: contain;
+        }
+        .v23-sem-escudo {
+          font-size: 48px;
+          line-height: 70px;
+        }
+        .v23-centro {
+          font-size: 23px;
+          font-weight: 900;
+          color: #f5c452;
+          white-space: nowrap;
+        }
+        .v23-info {
+          margin-top: 17px;
+          padding-top: 13px;
+          border-top: 1px solid #ffffff30;
+          text-align: center;
+          font-size: 13px;
+          color: #dce8ff;
+          line-height: 1.8;
+        }
+        @media(min-width:700px) {
+          .v23-escudo {width:90px;height:90px}
+          .v23-equipe {font-size:17px}
+          .v23-centro {font-size:30px}
+        }
+      `;
+      document.head.appendChild(estilo);
+    }
+
+    const nome = id => teams.find(t => t.id === id)?.name || 'Equipe';
+    const escudo = id => {
+      const time = teams.find(t => t.id === id);
+      const url = safeUrl(time?.crest || '');
+      return url
+        ? `<img class="v23-escudo" src="${esc(url)}" alt="Escudo">`
+        : '<span class="v23-sem-escudo">🛡️</span>';
+    };
+
+    const jogos = matches.slice().sort((a,b) =>
+      (a.date || '').localeCompare(b.date || '')
+    );
+
+    area.innerHTML = jogos.map(j => {
+      const finalizado =
+        Number.isInteger(j.homeScore) &&
+        Number.isInteger(j.awayScore);
+
+      const aoVivo = j.status === 'live';
+
+      const status = aoVivo
+        ? '🔴 AO VIVO'
+        : finalizado
+          ? '🏁 ENCERRADO'
+          : '📅 JOGO AGENDADO';
+
+      const centro = aoVivo
+        ? `${Number(j.liveHomeScore || 0)} × ${Number(j.liveAwayScore || 0)}`
+        : finalizado
+          ? `${j.homeScore} × ${j.awayScore}`
+          : 'VS';
+
+      const dataValida = j.date &&
+        !Number.isNaN(new Date(j.date).getTime());
+
+      const data = dataValida
+        ? new Date(j.date).toLocaleDateString('pt-BR')
+        : 'Data a definir';
+
+      const hora = dataValida
+        ? new Date(j.date).toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        : 'Horário a definir';
+
+      return `
+        <article class="v23-card">
+          <div class="v23-status">${status}</div>
+          <div class="v23-confronto">
+            <div class="v23-equipe">
+              ${escudo(j.homeId)}
+              <span>${esc(nome(j.homeId))}</span>
+            </div>
+            <div class="v23-centro">${centro}</div>
+            <div class="v23-equipe">
+              ${escudo(j.awayId)}
+              <span>${esc(nome(j.awayId))}</span>
+            </div>
+          </div>
+          <div class="v23-info">
+            📅 ${esc(data)} · 🕒 ${esc(hora)}
+            <div>📍 ${esc(j.venue || 'Local a definir')}</div>
+          </div>
+        </article>
+      `;
+    }).join('') || '<p class="muted">Nenhum jogo cadastrado.</p>';
+  }
+
+  const renderAnteriorV23 = render;
+  render = function () {
+    renderAnteriorV23();
+    montarJogosV23();
+  };
+
+  montarJogosV23();
+})();
