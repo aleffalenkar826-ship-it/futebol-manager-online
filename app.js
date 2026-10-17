@@ -650,8 +650,8 @@ render = function() {
           overflow-wrap: anywhere;
         }
         .v23-escudo {
-          width: 70px;
-          height: 70px;
+          width: 85px;
+          height: 85px;
           object-fit: contain;
         }
         .v23-sem-escudo {
