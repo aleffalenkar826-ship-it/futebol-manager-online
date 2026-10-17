@@ -813,6 +813,9 @@ render = function() {
               <div>📍 ${esc(j.venue || 'Local a definir')}</div>
             </div>
             ${manageButtons('matches', j.id)}
+             <button type="button" class="compartilhar-resultado" data-match-id="${esc(j.id)}">
+  📤 Compartilhar resultado
+</button>
           </article>
         `;
       }).join('') || '<p class="muted">Nenhum jogo cadastrado.</p>';
