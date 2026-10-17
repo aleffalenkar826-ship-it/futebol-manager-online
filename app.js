@@ -211,3 +211,50 @@ render = function() {
   renderOriginalV9();
   renderTeamsV9();
 };
+
+// V10 — Placar ao vivo (não altera a classificação antes de encerrar)
+function renderLiveV10(){
+  const root=document.getElementById('matches');
+  if(!root)return;
+  const byTeam=Object.fromEntries(teams.map(t=>[t.id,t]));
+  root.innerHTML=matches.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(m=>{
+    const live=m.status==='live';
+    const finished=m.status==='finished'||(Number.isInteger(m.homeScore)&&Number.isInteger(m.awayScore));
+    const h=live?Number(m.liveHomeScore||0):finished?m.homeScore:'-';
+    const a=live?Number(m.liveAwayScore||0):finished?m.awayScore:'-';
+    const controls=isAdmin?`<div class="actions" style="margin-top:10px">${live?
+      `<button data-live-action="homePlus" data-live-id="${esc(m.id)}">+1 ${esc(byTeam[m.homeId]?.name||'Casa')}</button><button data-live-action="homeMinus" data-live-id="${esc(m.id)}">−1 Casa</button><button data-live-action="awayPlus" data-live-id="${esc(m.id)}">+1 ${esc(byTeam[m.awayId]?.name||'Visitante')}</button><button data-live-action="awayMinus" data-live-id="${esc(m.id)}">−1 Visitante</button><button data-live-action="finish" data-live-id="${esc(m.id)}">Encerrar partida</button>`:
+      !finished?`<button data-live-action="start" data-live-id="${esc(m.id)}">▶ Iniciar ao vivo</button>`:''}</div>`:'';
+    return `<div class="match-card"><div class="match-score"><span>${esc(byTeam[m.homeId]?.name||'?')}</span><span class="score-pill">${h} × ${a}</span><span>${esc(byTeam[m.awayId]?.name||'?')}</span></div><p class="muted">${live?'🔴 AO VIVO · ':finished?'🏁 ENCERRADO · ':'📅 AGENDADO · '}${esc(m.date?new Date(m.date).toLocaleString('pt-BR'):'Data a definir')} · ${esc(m.venue||'Local a definir')}</p>${controls}${manageButtons('matches',m.id)}</div>`;
+  }).join('')||'Nenhum jogo cadastrado.';
+}
+const renderBeforeLiveV10=render;
+render=function(){renderBeforeLiveV10();renderLiveV10()};
+// Re-renderiza a tela quando o administrador entra ou sai.
+const renderStatsBeforeLiveV10=renderStats;
+renderStats=function(){renderStatsBeforeLiveV10();queueMicrotask(renderLiveV10)};
+let liveBusyV10=false;
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('[data-live-action]');if(!b)return;
+  if(liveBusyV10)return;
+  if(!auth.currentUser){msg('Entre como administrador.');return}
+  const m=matches.find(x=>x.id===b.dataset.liveId);if(!m)return;
+  const op=b.dataset.liveAction;
+  if(op==='start'&&(m.status==='live'||Number.isInteger(m.homeScore)||Number.isInteger(m.awayScore)))return;
+  if(op!=='start'&&m.status!=='live')return;
+  if(op==='finish'&&!confirm('Encerrar esta partida e registrar o placar na classificação?'))return;
+  liveBusyV10=true;
+  try{
+    const ref=doc(db,'matches',m.id);
+    if(op==='start')await updateDoc(ref,{status:'live',liveHomeScore:0,liveAwayScore:0});
+    else if(op==='finish')await updateDoc(ref,{status:'finished',homeScore:Number(m.liveHomeScore||0),awayScore:Number(m.liveAwayScore||0)});
+    else {
+      const field=op.startsWith('home')?'liveHomeScore':'liveAwayScore';
+      const delta=op.endsWith('Plus')?1:-1;
+      if(delta<0&&Number(m[field]||0)<=0)return;
+      await updateDoc(ref,{[field]:increment(delta)});
+    }
+    msg('Placar atualizado.');
+  }catch(err){msg('Erro no placar ao vivo: '+err.message)}
+  finally{liveBusyV10=false}
+});
