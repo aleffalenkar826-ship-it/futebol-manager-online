@@ -866,3 +866,33 @@ document.addEventListener('click', async (evento) => {
     alert('Resultado copiado para compartilhar!');
   }
 });
+/* V26 - Exibir botão Compartilhar nos jogos */
+
+function adicionarBotoesCompartilharV26() {
+  const area = document.getElementById('matches');
+  if (!area) return;
+
+  area.querySelectorAll('.match-card, .v23-card').forEach(cartao => {
+    if (cartao.querySelector('.compartilhar-resultado')) return;
+
+    const botao = document.createElement('button');
+    botao.type = 'button';
+    botao.className = 'compartilhar-resultado';
+    botao.textContent = '📤 Compartilhar resultado';
+    botao.style.cssText =
+      'display:block;width:100%;margin-top:12px;padding:12px;' +
+      'border-radius:10px;background:#071a31;color:white;' +
+      'font-weight:bold;cursor:pointer;';
+
+    cartao.appendChild(botao);
+  });
+}
+
+const renderAnteriorV26 = render;
+
+render = function () {
+  renderAnteriorV26();
+  adicionarBotoesCompartilharV26();
+};
+
+adicionarBotoesCompartilharV26();
