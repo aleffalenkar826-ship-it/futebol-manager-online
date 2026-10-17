@@ -829,3 +829,40 @@ render = function() {
 
   corrigirJogosV25();
 })();
+
+/* Compartilhar resultado - etapa 1 */
+document.addEventListener('click', async (evento) => {
+  const botao = evento.target.closest('.compartilhar-resultado');
+  if (!botao) return;
+
+  const cartao = botao.closest('.v23-card');
+  if (!cartao) {
+    alert('Não foi possível encontrar a partida.');
+    return;
+  }
+
+  const equipes = [...cartao.querySelectorAll('.v23-equipe span')];
+  const placar = cartao.querySelector('.v23-centro')?.textContent?.trim() || 'VS';
+
+  const mensagem = [
+    '🏆 5º CAMPEONATO AMIGOS DA BOLA 2026',
+    '',
+    `${equipes[0]?.textContent?.trim() || 'Equipe'} ${placar} ${equipes[1]?.textContent?.trim() || 'Equipe'}`,
+    '',
+    '⚽ AL Amigos Da Bola'
+  ].join('\n');
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ text: mensagem });
+    } catch (erro) {
+      if (erro.name !== 'AbortError') {
+        await navigator.clipboard.writeText(mensagem);
+        alert('Resultado copiado!');
+      }
+    }
+  } else {
+    await navigator.clipboard.writeText(mensagem);
+    alert('Resultado copiado para compartilhar!');
+  }
+});
