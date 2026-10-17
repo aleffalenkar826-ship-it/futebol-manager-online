@@ -150,3 +150,64 @@ document.addEventListener('click',e=>{
 });
 setInterval(syncAdminAccess,1200);
 setTimeout(syncAdminAccess,100);
+
+ // V9 - Jogadores separados por equipe
+let v9SelectedTeam = '';
+
+function renderTeamsV9() {
+  const area = document.getElementById('teams');
+  if (!area) return;
+
+  if (!teams.length) {
+    area.innerHTML = '<p class="muted">Nenhum time cadastrado.</p>';
+    return;
+  }
+
+  if (!teams.some(t => t.id === v9SelectedTeam)) {
+    v9SelectedTeam = teams[0].id;
+  }
+
+  area.innerHTML = `
+    <h3>Selecione uma equipe</h3>
+    <div class="grid">
+      ${teams.map(t => `
+        <button type="button" data-v9-team="${esc(t.id)}">
+          ${esc(t.name)}
+        </button>
+      `).join('')}
+    </div>
+    ${teams.filter(t => t.id === v9SelectedTeam).map(t => `
+      <h3>${esc(t.name)} (${players.filter(p => p.teamId === t.id).length} jogadores)</h3>
+      ${manageButtons('teams', t.id)}
+      ${players.filter(p => p.teamId === t.id)
+        .sort((a,b) => a.name.localeCompare(b.name))
+        .map(p => `
+          <div class="player-card">
+            ${p.photo ? `<img class="player-photo" src="${esc(safeUrl(p.photo))}" alt="">` : ''}
+            <div class="player-main">
+              <b>${esc(p.number || '-')} · ${esc(p.name)}</b>
+              <div class="quick-actions">
+                ${statCounter(p,'goals','⚽','goal')}
+                ${statCounter(p,'yellow','🟨','yellow')}
+                ${statCounter(p,'red','🟥','red')}
+              </div>
+            </div>
+            ${manageButtons('players',p.id)}
+          </div>
+        `).join('') || '<p class="muted">Sem jogadores cadastrados.</p>'}
+    `).join('')}
+  `;
+}
+
+document.addEventListener('click', e => {
+  const button = e.target.closest('[data-v9-team]');
+  if (!button) return;
+  v9SelectedTeam = button.dataset.v9Team;
+  renderTeamsV9();
+});
+
+const renderOriginalV9 = render;
+render = function() {
+  renderOriginalV9();
+  renderTeamsV9();
+};
