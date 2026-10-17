@@ -258,3 +258,101 @@ document.addEventListener('click',async e=>{
   }catch(err){msg('Erro no placar ao vivo: '+err.message)}
   finally{liveBusyV10=false}
 });
+
+// V11 - Classificação avançada
+function renderStandingsV11() {
+  const area = document.getElementById('standings');
+  if (!area) return;
+
+  const teamRows = teams.map(t => ({
+    ...t, pts: 0, j: 0, v: 0, e: 0, d: 0,
+    gp: 0, gc: 0, sg: 0, recent: []
+  }));
+
+  const byId = new Map(teamRows.map(t => [t.id, t]));
+
+  const completed = matches
+    .filter(m =>
+      m.status !== 'live' &&
+      Number.isInteger(m.homeScore) &&
+      Number.isInteger(m.awayScore)
+    )
+    .sort((a,b) =>
+      (a.date || '').localeCompare(b.date || '')
+    );
+
+  for (const m of completed) {
+    const h = byId.get(m.homeId);
+    const a = byId.get(m.awayId);
+    if (!h || !a) continue;
+
+    h.j++; a.j++;
+    h.gp += m.homeScore;
+    h.gc += m.awayScore;
+    a.gp += m.awayScore;
+    a.gc += m.homeScore;
+
+    if (m.homeScore > m.awayScore) {
+      h.v++; h.pts += 3; a.d++;
+      h.recent.push('V'); a.recent.push('D');
+    } else if (m.homeScore < m.awayScore) {
+      a.v++; a.pts += 3; h.d++;
+      h.recent.push('D'); a.recent.push('V');
+    } else {
+      h.e++; a.e++;
+      h.pts++; a.pts++;
+      h.recent.push('E'); a.recent.push('E');
+    }
+  }
+
+  teamRows.forEach(t => t.sg = t.gp - t.gc);
+
+  teamRows.sort((a,b) =>
+    b.pts-a.pts ||
+    b.sg-a.sg ||
+    b.gp-a.gp ||
+    a.name.localeCompare(b.name)
+  );
+
+  const form = t => t.recent.slice(-5).map(r => {
+    const color = r === 'V' ? '#16803c' :
+                  r === 'E' ? '#b7791f' : '#c53030';
+    return `<span style="display:inline-block;background:${color};color:white;border-radius:5px;padding:3px 6px;margin:1px;font-weight:bold">${r}</span>`;
+  }).join('') || '—';
+
+  const html = teamRows.map((t,i) => {
+    const ap = t.j ? (t.pts/(t.j*3)*100).toFixed(1) : '0,0';
+    const crest = t.crest && safeUrl(t.crest)
+      ? `<img src="${esc(safeUrl(t.crest))}" alt="" style="width:28px;height:28px;object-fit:contain;vertical-align:middle">`
+      : '';
+
+    return `<tr>
+      <td>${i+1}</td>
+      <td>${crest} ${esc(t.name)}</td>
+      <td><b>${t.pts}</b></td>
+      <td>${t.j}</td><td>${t.v}</td>
+      <td>${t.e}</td><td>${t.d}</td>
+      <td>${t.gp}</td><td>${t.gc}</td>
+      <td>${t.sg}</td>
+      <td>${ap.replace('.',',')}%</td>
+      <td style="white-space:nowrap">${form(t)}</td>
+    </tr>`;
+  }).join('');
+
+  const table = area.closest('table');
+  if (!table) return;
+
+  const head = table.querySelector('thead tr');
+  if (head) head.innerHTML =
+    '<th>#</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>AP%</th><th>Últimos 5</th>';
+
+  area.innerHTML = html;
+  table.style.display = 'block';
+  table.style.overflowX = 'auto';
+}
+
+const renderBeforeV11 = render;
+render = function() {
+  renderBeforeV11();
+  renderStandingsV11();
+};
