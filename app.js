@@ -1,6 +1,6 @@
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-import {getFirestore,collection,addDoc,updateDoc,deleteDoc,doc,onSnapshot,query,where} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import {getFirestore,increment,collection,addDoc,updateDoc,deleteDoc,doc,onSnapshot,query,where} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 const firebaseConfig={apiKey:'AIzaSyDIFZyWck2xo3ZZARbVgmPq9-ppuLzdt5M',authDomain:'futebol-manager-online.firebaseapp.com',projectId:'futebol-manager-online',storageBucket:'futebol-manager-online.firebasestorage.app',messagingSenderId:'779731462015',appId:'1:779731462015:web:11b328964939d05f729c4a'};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);const $=id=>document.getElementById(id);let champs=[],teams=[],players=[],matches=[],selected='',unsubs=[],isAdmin=false;const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const msg=s=>$('status').textContent=s;
 function listen(col,cb,filter=null){return onSnapshot(filter?query(collection(db,col),where('championshipId','==',filter)):collection(db,col),snap=>cb(snap.docs.map(d=>({id:d.id,...d.data()}))),err=>msg('Erro ao carregar '+col+': '+err.message))}
