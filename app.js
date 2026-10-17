@@ -764,7 +764,7 @@ render = function() {
 (function () {
   function corrigirJogosV25() {
     const area = document.getElementById('matches');
-    if (!area || !Array.isArray(matches) || !Array.isArray(teams)) return;
+    if (!area) return;
 
     const nome = id => teams.find(t => t.id === id)?.name || 'Equipe';
     const escudo = id => {
