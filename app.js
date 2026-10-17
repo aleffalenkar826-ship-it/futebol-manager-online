@@ -759,3 +759,70 @@ render = function() {
 
   montarJogosV23();
 })();
+
+// V25 - Corrigir placares com escudos e preservar botoes
+(function () {
+  function corrigirJogosV25() {
+    const area = document.getElementById('matches');
+    if (!area || !Array.isArray(matches) || !Array.isArray(teams)) return;
+
+    const nome = id => teams.find(t => t.id === id)?.name || 'Equipe';
+    const escudo = id => {
+      const time = teams.find(t => t.id === id);
+      const url = safeUrl(time?.crest || '');
+      return url
+        ? `<img class="v23-escudo" src="${esc(url)}" alt="Escudo">`
+        : '<span class="v23-sem-escudo">🛡️</span>';
+    };
+
+    area.innerHTML = matches.slice()
+      .sort((a, b) => (a.date || '').localeCompare(b.date || ''))
+      .map(j => {
+        const finalizado = Number.isInteger(j.homeScore) &&
+          Number.isInteger(j.awayScore);
+        const aoVivo = j.status === 'live';
+
+        const placar = aoVivo
+          ? `${Number(j.liveHomeScore || 0)} × ${Number(j.liveAwayScore || 0)}`
+          : finalizado
+            ? `${j.homeScore} × ${j.awayScore}`
+            : 'VS';
+
+        const data = j.date && !Number.isNaN(new Date(j.date).getTime())
+          ? new Date(j.date).toLocaleString('pt-BR')
+          : 'Data a definir';
+
+        return `
+          <article class="v23-card">
+            <div class="v23-status">
+              ${aoVivo ? '🔴 AO VIVO' : finalizado ? '🏁 ENCERRADO' : '📅 AGENDADO'}
+            </div>
+            <div class="v23-confronto">
+              <div class="v23-equipe">
+                ${escudo(j.homeId)}
+                <span>${esc(nome(j.homeId))}</span>
+              </div>
+              <div class="v23-centro">${placar}</div>
+              <div class="v23-equipe">
+                ${escudo(j.awayId)}
+                <span>${esc(nome(j.awayId))}</span>
+              </div>
+            </div>
+            <div class="v23-info">
+              📅 ${esc(data)}
+              <div>📍 ${esc(j.venue || 'Local a definir')}</div>
+            </div>
+            ${manageButtons('matches', j.id)}
+          </article>
+        `;
+      }).join('') || '<p class="muted">Nenhum jogo cadastrado.</p>';
+  }
+
+  const renderAnteriorV25 = render;
+  render = function () {
+    renderAnteriorV25();
+    corrigirJogosV25();
+  };
+
+  corrigirJogosV25();
+})();
